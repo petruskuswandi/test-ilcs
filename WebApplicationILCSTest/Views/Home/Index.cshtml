@@ -29,13 +29,13 @@
             </div>
 
             <div class="mb-3">
-                <label for="barang" class="form-label">Deskripsi</label>
-                <textarea id="barang" disabled class="form-control" rows="3"></textarea>
+                <label for="description" class="form-label">Deskripsi</label>
+                <textarea id="description" disabled class="form-control" rows="3"></textarea>
             </div>
 
             <div class="mb-3">
-                <label for="harga" class="form-label">Harga Rp.</label>
-                <input id="harga" type="number" class="form-control" placeholder="0">
+                <label for="price" class="form-label">Harga Rp.</label>
+                <input id="price" type="number" class="form-control" placeholder="0">
             </div>
 
             <div class="mb-3">
@@ -49,9 +49,7 @@
             </div>
 
             <div class="text-center">
-                <button type="button" class="btn btn-primary" id="submitButton">
-                    Submit
-                </button>
+                <button type="button" class="btn btn-primary" id="submitButton">Submit</button>
             </div>
         </form>
     </div>
@@ -82,7 +80,7 @@
                         dataType: "json",
                         data: {
                             ur_pelabuhan: request.term,
-                            kd_negara: $('#neg').attr("data-id")
+                            kd_negara: $('#negara').attr("data-id")
                         },
                         success: function (data) {
                             response($.map(data.data, function (item) {
@@ -99,7 +97,7 @@
                 }
             });
 
-            $('#brgid').on('input', function () {
+            $('#item_id').on('input', function () {
                 var value = $(this).val();
                 if (value) {
                     $.ajax({
@@ -108,16 +106,16 @@
                         data: { hs_code: value },
                         dataType: "json",
                         success: function (data) {
-                            $("#barang").text(data.data[0].sub_header + data.data[0].uraian_id);
+                            $("#description").text(data.data[0].sub_header + data.data[0].uraian_id);
                         },
                         error: function (xhr, status, error) {
-                            $("#barang").text("");
+                            $("#description").text("");
                         }
                     });
                 }
             });
 
-            $('#brgid').on('input', function () {
+            $('#item_id').on('input', function () {
                 var value = $(this).val();
                 if (value) {
                     $.ajax({
@@ -135,8 +133,8 @@
                 }
             });
 
-            $("#harga").on('input', function () {
-                var harga = parseFloat($("#harga").val());
+            $("#price").on('input', function () {
+                var harga = parseFloat($("#price").val());
                 var tbm = parseFloat($("#tbm").val());
 
                 if (!isNaN(harga) && !isNaN(tbm)) {
