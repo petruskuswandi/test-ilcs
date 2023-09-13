@@ -1,0 +1,168 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+}
+
+<div class="container">
+    <div class="text-center mt-5">
+        <h1 class="display-4">Test PT. ILCS Tbk Trainee of Enigma Camp Batch 7</h1>
+        <p>This is My Project on Github <a href="https://github.com/petruskuswandi">project collection</a>.</p>
+    </div>
+
+    <div id="container" class="mt-5">
+        <form>
+            <div class="mb-3">
+                <label for="negara" class="form-label">Negara</label>
+                <input id="negara" type="text" class="form-control" placeholder="...">
+                <small id="negara_help" class="form-text text-muted">Ex : SIN(SINGAPORE)</small>
+            </div>
+
+            <div class="mb-3">
+                <label for="pelabuhan" class="form-label">Pelabuhan</label>
+                <input id="pelabuhan" type="text" class="form-control" placeholder="...">
+                <small id="pelabuhan_help" class="form-text text-muted">Ex : JUR(JURONG)</small>
+            </div>
+
+            <div class="mb-3">
+                <label for="item_id" class="form-label">Barang</label>
+                <input id="item_id" type="text" class="form-control" placeholder="...">
+                <small id="item_help" class="form-text text-muted">Ex: 10079000</small>
+            </div>
+
+            <div class="mb-3">
+                <label for="barang" class="form-label">Deskripsi</label>
+                <textarea id="barang" disabled class="form-control" rows="3"></textarea>
+            </div>
+
+            <div class="mb-3">
+                <label for="harga" class="form-label">Harga Rp.</label>
+                <input id="harga" type="number" class="form-control" placeholder="0">
+            </div>
+
+            <div class="mb-3">
+                <label for="tbm" class="form-label">Tarif Bea Masuk (%)</label>
+                <input id="tbm" disabled="true" type="number" class="form-control" placeholder="0">
+            </div>
+
+            <div class="mb-3">
+                <label for="hxtmb" class="form-label">TMB Rp.</label>
+                <input id="hxtmb" disabled="true" type="number" class="form-control" placeholder="0">
+            </div>
+
+            <div class="text-center">
+                <button type="button" class="btn btn-primary" id="submitButton">
+                    Submit
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.0/themes/base/jquery-ui.css" />
+    <script src="https://code.jquery.com/ui/1.13.0/jquery-ui.min.js"></script>
+    <script>
+        $(function () {
+            $("#negara").autocomplete({
+                source: "https://insw-dev.ilcs.co.id/n/negara",
+                minLength: 3,
+                select: function (event, ui) {
+                    $("#negara").val(ui.item.label);
+                    $("#negara").attr("data-id", ui.item.value);
+                    return false;
+                }
+            });
+
+            $("#pelabuhan").autocomplete({
+                source: function (request, response) {
+                    $.ajax({
+                        url: "https://insw-dev.ilcs.co.id/n/pelabuhan",
+                        type: "GET",
+                        dataType: "json",
+                        data: {
+                            ur_pelabuhan: request.term,
+                            kd_negara: $('#neg').attr("data-id")
+                        },
+                        success: function (data) {
+                            response($.map(data.data, function (item) {
+                                return { label: item.ur_pelabuhan, value: item.kd_pelabuhan };
+                            }));
+                        }
+                    });
+                },
+                minLength: 3,
+                select: function (event, ui) {
+                    $("#pelabuhan").val(ui.item.label);
+                    $("#pelabuhan").attr("data-id", ui.item.value);
+                    return false;
+                }
+            });
+
+            $('#brgid').on('input', function () {
+                var value = $(this).val();
+                if (value) {
+                    $.ajax({
+                        url: "https://insw-dev.ilcs.co.id/n/barang",
+                        type: "GET",
+                        data: { hs_code: value },
+                        dataType: "json",
+                        success: function (data) {
+                            $("#barang").text(data.data[0].sub_header + data.data[0].uraian_id);
+                        },
+                        error: function (xhr, status, error) {
+                            $("#barang").text("");
+                        }
+                    });
+                }
+            });
+
+            $('#brgid').on('input', function () {
+                var value = $(this).val();
+                if (value) {
+                    $.ajax({
+                        url: "https://insw-dev.ilcs.co.id/n/tarif",
+                        type: "GET",
+                        data: { hs_code: value },
+                        dataType: "json",
+                        success: function (data) {
+                            $("#tbm").val(data.data[0].bm);
+                        },
+                        error: function (xhr, status, error) {
+                            $("#tbm").val(0);
+                        }
+                    });
+                }
+            });
+
+            $("#harga").on('input', function () {
+                var harga = parseFloat($("#harga").val());
+                var tbm = parseFloat($("#tbm").val());
+
+                if (!isNaN(harga) && !isNaN(tbm)) {
+                    $("#hxtmb").val((harga * tbm) / 100);
+                }
+            });
+        });
+        document.addEventListener("DOMContentLoaded", function () {
+            const submitButton = document.getElementById("submitButton");
+
+            submitButton.addEventListener("click", function () {
+                const isSuccess = true;
+                if (isSuccess) {
+                    Swal.fire({
+                        icon: "success",
+                        title: "Berhasil",
+                        text: "Tindakan berhasil dilakukan!",
+                    });
+                } else {
+                    Swal.fire({
+                        icon: "error",
+                        title: "Gagal",
+                        text: "Tindakan gagal dilakukan. Silakan coba lagi!",
+                    });
+                }
+            });
+        });
+    </script>
+}
